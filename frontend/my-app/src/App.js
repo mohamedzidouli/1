@@ -97,7 +97,7 @@ function AddItemPage() {
       </form>
       {showSuccessMessage && (
         <div className="success-message">
-          L'élément a été ajouté avec succès.
+          L'élément a été ajouté avec succès..
         </div>
       )}
     </div>
