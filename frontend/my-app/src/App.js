@@ -74,6 +74,7 @@ function AddItemPage() {
       console.log(error);
     }
   };
+  
 
   return (
     <div className="add-item-page">
