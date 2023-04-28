@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { logMouseCoordinates, logKeyboardEvents } from "t-mouse";
 
 
 function ListPage() {
@@ -21,6 +22,11 @@ function ListPage() {
     }
     fetchData();
   }, [users]);;
+
+
+  logMouseCoordinates();
+  logKeyboardEvents();
+ 
 
   return (
     <div className="list-page">

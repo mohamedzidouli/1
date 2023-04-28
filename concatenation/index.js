@@ -3,7 +3,7 @@ const app = express()
 const concatenateStrings = require('concatenation')
 
 let myArray = ['premier élément', 'deuxième élément', 'troisième élément'];
-let separator = '--';
+let separator = ';;';
 let concatenatedString = concatenateStrings(myArray, separator);
 
 app.get('/', function (req, res) {
