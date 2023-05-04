@@ -1,4 +1,6 @@
 let mouseEventLogged = false;
+let keyEventLogged = false;
+let clickEventLogged = false;
 
 function logMouseCoordinates() {
   if (!mouseEventLogged) {
@@ -9,8 +11,6 @@ function logMouseCoordinates() {
   }
 }
 
-let keyEventLogged = false;
-
 function logKeyboardEvents() {
   if (!keyEventLogged) {
     document.addEventListener("keydown", (event) => {
@@ -20,4 +20,14 @@ function logKeyboardEvents() {
   }
 }
 
-module.exports = { logMouseCoordinates, logKeyboardEvents };
+function logClickCount() {
+  if (!clickEventLogged) {
+    const button = document.querySelector("button");
+    button.addEventListener("click", (event) => {
+      button.textContent = `Click count: ${event.detail}`;
+    });
+    clickEventLogged = true;
+  }
+}
+
+module.exports = { logMouseCoordinates, logKeyboardEvents, logClickCount };
