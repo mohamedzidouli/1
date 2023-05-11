@@ -1,54 +1,37 @@
-import React, { useState, useEffect, useCallback } from 'react';
-
-import { logMouseCoordinates, logKeyboardEvents, logClickCount } from "t-mouse";
+import React, { useState, useEffect } from 'react';
+import { init } from 'tra-key';
+import logMouseCoordinates from 't-mouse';
 
 function MouseKey() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [pressedKey, setPressedKey] = useState("");
-  const [clickCount, setClickCount] = useState(0);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    logMouseCoordinates();
+    const mouseCoordinates = logMouseCoordinates();
+    const keyData = init();
+
+    setData(prevData => [...prevData, { mouseCoordinates, keyData }]);
   }, []);
 
-  useEffect(() => {
-    logKeyboardEvents();
-  }, []);
-
-  useEffect(() => {
-    logClickCount();
-  }, []);
-
-  const handleMouseMove = useCallback((event) => {
-    setMousePosition({ x: event.clientX, y: event.clientY });
-  }, []);
-
-  const handleKeyDown = useCallback((event) => {
-    setPressedKey(event.key);
-  }, []);
-
-  const handleButtonClick = useCallback((event) => {
-    setClickCount(event.detail);
-  }, []);
-
-  useEffect(() => {
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("keydown", handleKeyDown);
-    const button = document.querySelector("button");
-    button.addEventListener("click", handleButtonClick);
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("keydown", handleKeyDown);
-      button.removeEventListener("click", handleButtonClick);
-    };
-  }, [handleMouseMove, handleKeyDown, handleButtonClick]);
+  const handleSaveData = async () => {
+    try {
+      const formattedData = data.map(({ mouseCoordinates, keyData }) => ({ mouseCoordinates, keyData }));
+      const response = await fetch('http://localhost:3000/data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formattedData),
+      });
+      const responseData = await response.json();
+      console.log('Saved data:', responseData);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
 
   return (
     <div className="mouse-keyboard-logger">
-      <p>Mouse position: {mousePosition.x}, {mousePosition.y}</p>
-      <p>Pressed key: {pressedKey}</p>
-      <p>Click count: {clickCount}</p>
-      <button>Click me</button>
+      <button onClick={handleSaveData}>Collecter les données</button>
     </div>
   );
 }

@@ -10,7 +10,7 @@ const cors = require('cors');
 app.use(cors());
 const port = 3000;
 
-const uri = "mongodb+srv://med:medmed0909@cluster0.k2gaxg2.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb+srv://med:medmed0909@cluster0.lhchdj4.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -51,6 +51,19 @@ app.post("/users", async (req, res) => {
   }
 });
 
+app.post("/data", async (req, res) => {
+  try {
+    const db = client.db("mydb");
+    const data = db.collection("data");
+    const value = req.body; 
+    const result = await data.insertOne({ value }); 
+    res.status(201).send(value); 
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // GET endpoint for retrieving all users
 app.get("/users", async (_, res) => {
   try {
@@ -79,7 +92,8 @@ async function createDatabaseAndCollection() {
       // Check if the collection "users" already exists
       const collections = await db.listCollections().toArray();
       const collectionExists = collections.some(
-        (collection) => collection.name === "users"
+        (collection) => collection.name === "users",
+        (collection) => collection.name === "data"
       );
       if (collectionExists) {
         console.log("Collection already exists");
@@ -88,6 +102,7 @@ async function createDatabaseAndCollection() {
   
       // Create a collection named "users"
       await db.createCollection("users");
+      await db.createCollection("data");
   
       console.log("Successfully created database and collection!");
     } catch (err) {
@@ -98,3 +113,6 @@ async function createDatabaseAndCollection() {
   }
 
 createDatabaseAndCollection(); 
+
+
+
