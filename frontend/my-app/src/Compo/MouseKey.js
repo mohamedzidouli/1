@@ -1,37 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { init } from 'tra-key';
-import logMouseCoordinates from 't-mouse';
+import { logKeyboardEvents, logMouseCoordinates, removeEventListeners} from 't-mouse';
+import { handleSaveData } from 'postmk';
 
 function MouseKey() {
   const [data, setData] = useState([]);
+  const [isRecording, setIsRecording] = useState(true);
+
+
+  
+  useEffect(() => {
+    if (isRecording) {
+      const mouseCoordinates = logMouseCoordinates();
+      const keyboardCoordinates = logKeyboardEvents();
+
+      setData(prevData => [...prevData, { mouseCoordinates, keyboardCoordinates }]);
+    }
+  }, [isRecording]);
+
 
   useEffect(() => {
-    const mouseCoordinates = logMouseCoordinates();
-    const keyData = init();
+    const timerId = setTimeout(() => {
+      setIsRecording(false);
+      removeEventListeners();
+      handleSaveData(data);
+    }, 10000);
 
-    setData(prevData => [...prevData, { mouseCoordinates, keyData }]);
-  }, []);
+    return () => {
+      clearTimeout(timerId);
+    };
+    
+  }, [data]);
 
-  const handleSaveData = async () => {
-    try {
-      const formattedData = data.map(({ mouseCoordinates, keyData }) => ({ mouseCoordinates, keyData }));
-      const response = await fetch('http://localhost:3000/data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formattedData),
-      });
-      const responseData = await response.json();
-      console.log('Saved data:', responseData);
-    } catch (error) {
-      console.error('Error saving data:', error);
-    }
-  };
+
+
+
 
   return (
     <div className="mouse-keyboard-logger">
-      <button onClick={handleSaveData}>Collecter les données</button>
+      <p>10 sec</p>
     </div>
   );
 }
